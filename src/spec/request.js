@@ -42,6 +42,15 @@ define(['lib/request'], function(request){
 				expect(callback.calledOnce).to.be.true;
 				done();
 			});
+
+			it('should pass an error as first argument if no buffer is returned', function(done) {
+				var callback = sinon.spy();
+				request.getBuffer('piano', callback);
+				requests[0].onload(); // trigger the onload event
+
+				expect(callback.args[0]).to.not.be.undefined;
+				done();
+			});
 		});
 
 

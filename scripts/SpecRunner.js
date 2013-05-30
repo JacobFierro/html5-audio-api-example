@@ -5,7 +5,13 @@ require.config({
 });
 
 // Require libraries
-require(['require', 'vendor/chai', 'vendor/mocha'], function(require,chai){
+require([
+  'require', 
+  'vendor/chai', 
+  'vendor/sinon', 
+  'vendor/mocha',
+  'vendor/jquery'
+  ], function(require,chai,sinon){
 
   // Chai
   assert = chai.assert;
@@ -13,10 +19,17 @@ require(['require', 'vendor/chai', 'vendor/mocha'], function(require,chai){
   expect = chai.expect;
 
   // Mocha
-  mocha.setup('bdd');
+  mocha.setup({
+    ui: "bdd",
+    globals:["XMLHttpRequest"]
+  });
 
   // Require base tests before starting
-  require(['spec/context'], function(context){
+  require([
+    'spec/context',
+    'spec/request'
+    ], 
+    function(){
     // Start runner
     mocha.run();
   });

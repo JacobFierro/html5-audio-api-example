@@ -21,7 +21,7 @@ define(['lib/request'], function(request){
 		    xhr.restore();
 		});
 
-		describe('getBuffer', function(){
+		describe('#getBuffer', function(){
 			it('makes a GET request', function(done) {
 				request.getBuffer('piano', sinon.spy());
 			    expect(requests.length).to.equal(1);

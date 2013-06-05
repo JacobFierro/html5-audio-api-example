@@ -27,7 +27,7 @@ require([
   // Require base tests before starting
   require([
     'spec/context',
-    'spec/request'
+    'spec/http'
     ], 
     function(){
     // Start runner

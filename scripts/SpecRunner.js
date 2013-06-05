@@ -27,9 +27,10 @@ require([
   // Require base tests before starting
   require([
     'spec/context',
-    'spec/http'
-    ], 
-    function(){
+    'spec/http',
+    'spec/sound'
+  ], 
+  function(){
     // Start runner
     mocha.run();
   });

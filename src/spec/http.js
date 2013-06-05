@@ -1,9 +1,4 @@
 define(['lib/http'], function(http){
-	/*
-	 - Request.get() should exist
-	 - get() should take a callback
-	 - callback should pass a buffer
-	*/
 
 	describe('http', function() {
 
@@ -70,10 +65,5 @@ define(['lib/http'], function(http){
 				done();
 			});
 		});
-
-
-
-
-
 	}); // describe 'http'
 });

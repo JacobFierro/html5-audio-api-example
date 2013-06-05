@@ -1,4 +1,4 @@
-define(['lib/context'],function(Context){
+define(['lib/audioContext'],function(Context){
 
   describe('AudioContext', function(){
   	var context;

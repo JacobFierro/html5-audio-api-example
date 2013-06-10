@@ -9,7 +9,8 @@ require([
   'lib/sound',
   'vendor/jquery'
 ], function(Sound){
-  var $button = $('#soundTrigger');
+  var $playButton = $('#playTrigger');
+  var $stopButton = $('#stopTrigger')
 
   var piano = new Sound;
   piano.load('/src/sounds/piano.mp3', function(err) {
@@ -20,12 +21,17 @@ require([
   });
 
   function showButton() {
-    $button.show();
+    $playButton.show();
+    $stopButton.show();
   }
 
   function setButtonHandler() {
-    $('#soundTrigger').on('click', function(){
+    $playButton.on('click', function(){
       piano.play();
+    });
+
+    $stopButton.on('click', function(){
+      piano.stop();
     });
   }
 });

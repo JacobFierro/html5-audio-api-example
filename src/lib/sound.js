@@ -5,50 +5,80 @@ define([
 	
 	var audioContext = require('lib/audioContext').audioContext;
 
+	/**
+	* @constructor
+	* @param {String} [filePath]
+	*/
 	function Sound() {
-		var buffer,
-			file,
-			source;
+		this.buffer = null;
+		this.filePath = "";
+		this.source = {};
+		this.isPlaying = false;
 	}
 
-	Sound.prototype.setSourceFile = function(filePath) {
-		this.file = filePath;
+	Sound.prototype.setFilePath = function(filePath) {
+		this.filePath = filePath;
 	}
 
-	Sound.prototype.getSourceFile = function() {
-		return this.file;
+	Sound.prototype.getFilePath = function() {
+		return this.filePath;
 	}
 
 	Sound.prototype.load = function(filePath, callback) {
 		var self = this;
-		this.setSourceFile(filePath);
+		this.setFilePath(filePath);
 
 		http.get(filePath, 'arraybuffer', function(err, audioData){
 			if (err) callback(err);
 
 			audioContext.decodeAudioData(audioData, function(audioBuffer) {
 		    	self.buffer = audioBuffer;
-				callback(null);
+				callback();
 		    }, function onError(){
-		    	callback(new Error('Unable to decode the audio data from' + this.getSourceFile()));
+		    	callback(Error('Unsupported file type from: ' + self.getFilePath()));
 		    });
 		});
+	}
+
+	Sound.prototype.createSource = function() {
+		this.source = audioContext.createBufferSource();
+		this.source.buffer = this.buffer;                    		// tell the source which sound to play
+		this.source.connect(audioContext.destination);      // connect the source to the audioContext's destination (the speakers)
+		this.source.loop = true;
 	}
 
 	/**
 	* TODO: this seems too simple, what about all that other crap you can do?
 	*/
 	Sound.prototype.play = function() {
-		this.source = audioContext.createBufferSource(); // creates a sound source
-		this.source.buffer = this.buffer;                    		// tell the source which sound to play
-		this.source.connect(audioContext.destination);       // connect the source to the audioContext's destination (the speakers)
-		this.source.start(0);                           		// play the source now
-		// note: on older systems, may have to use deprecated noteOn(time);
+		this.createSource();
+		this.source.start(0.0);
+		this.isPlaying = true;		
+		//note: on older systems, may have to use deprecated noteOn(time);
 	}
 
 	Sound.prototype.stop = function() {
-
+		this.source.stop(0.0);
+		this.isPlaying = false;		
 	}
+
+	/**
+	* todo: playbackState isn't updating fast enough to accurately catch it here
+	*		and buffersourcenode doesn't implement addEventListener
+	*/ 
+	/*
+	Sound.prototype.setPlayState = function() {
+		var playStates = {
+			0 : "UNSCHEDULED_STATE",
+			1 : "SCHEDULED_STATE",
+			2 : "PLAYING_STATE",
+			3 : "FINISHED_STATE"
+		};
+
+		var playbackcode = (!!this.source) ? this.source.playbackState : 0;
+		this.playState = playStates[playbackcode];
+	}
+	*/
 
 	// return constructor
 

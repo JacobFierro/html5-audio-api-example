@@ -1,7 +1,7 @@
 define([
-	'lib/http',
+	'lib/bufferLoader',
 	'lib/audioContext'
-], function(http){
+], function(bufferLoader){
 	
 	var audioContext = require('lib/audioContext').audioContext;
 
@@ -25,22 +25,22 @@ define([
 	}
 
 	Sound.prototype.load = function(filePath, callback) {
-		var self = this;
+		if (typeof callback !== "function") callback = function(){};
 		this.setFilePath(filePath);
-
-		http.get(filePath, 'arraybuffer', function(err, audioData){
-			if (err) callback(err);
-
-			audioContext.decodeAudioData(audioData, function(audioBuffer) {
-		    	self.buffer = audioBuffer;
-				callback();
-		    }, function onError(){
-		    	callback(Error('Unsupported file type from: ' + self.getFilePath()));
-		    });
+		
+		var self = this;
+		bufferLoader.load(filePath, function(err, buffer) {
+			if (err) throw err;
+			self.setBuffer(buffer, callback);
 		});
 	}
 
-	Sound.prototype.createSource = function() {
+	Sound.prototype.setBuffer = function(buffer, cb) {
+		this.buffer = buffer;
+		if (typeof cb === 'function') cb();
+	}
+
+	Sound.prototype.connectAudioGraph = function() {
 		this.source = audioContext.createBufferSource();
 		this.source.buffer = this.buffer;                    		// tell the source which sound to play
 		this.source.connect(audioContext.destination);      // connect the source to the audioContext's destination (the speakers)
@@ -51,7 +51,7 @@ define([
 	* TODO: this seems too simple, what about all that other crap you can do?
 	*/
 	Sound.prototype.play = function() {
-		this.createSource();
+		this.connectAudioGraph();
 		this.source.start(0.0);
 		this.isPlaying = true;		
 		//note: on older systems, may have to use deprecated noteOn(time);
@@ -62,24 +62,7 @@ define([
 		this.isPlaying = false;		
 	}
 
-	/**
-	* todo: playbackState isn't updating fast enough to accurately catch it here
-	*		and buffersourcenode doesn't implement addEventListener
-	*/ 
-	/*
-	Sound.prototype.setPlayState = function() {
-		var playStates = {
-			0 : "UNSCHEDULED_STATE",
-			1 : "SCHEDULED_STATE",
-			2 : "PLAYING_STATE",
-			3 : "FINISHED_STATE"
-		};
-
-		var playbackcode = (!!this.source) ? this.source.playbackState : 0;
-		this.playState = playStates[playbackcode];
-	}
-	*/
-
+	
 	// return constructor
 
 	return Sound;

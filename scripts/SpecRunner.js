@@ -26,9 +26,10 @@ require([
 
   // Require base tests before starting
   require([
-    'spec/context',
+    'spec/audioContext',
     'spec/http',
-    'spec/sound'
+    'spec/sound',
+    'spec/bufferLoader'
   ], 
   function(){
     // Start runner

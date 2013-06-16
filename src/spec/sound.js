@@ -1,8 +1,8 @@
 define([
-	'lib/sound', 
-	'lib/bufferLoader',
+	'lib/sound',
+	'lib/utils',
 	'lib/audioContext'
-], function(Sound, bufferLoader, audioContext){
+], function(Sound, utils){
 
 	var audioContext = require('lib/audioContext').audioContext;
 
@@ -10,13 +10,16 @@ define([
 
 		var sound;
 		var testFile = '/src/sounds/piano.mp3';
-		var badFile = '/src/sounds/unsupportedFileType.png';
+		var testBuffer = "test buffer";
 
 		beforeEach(function(){
-			sound = new Sound;
+			var isBufferStub = sinon.stub(utils, 'isBuffer');
+			isBufferStub.returns(true);
+			sound = new Sound(testBuffer);
 		});
 
 		afterEach(function() {
+			utils.isBuffer.restore();
 			sound = null;
 		});
 
@@ -25,40 +28,20 @@ define([
 			expect(Sound).to.be.a('function');
 		});
 
-		describe('#load', function() {
-
-			beforeEach(function(){
-				sinon.spy(sound, 'load');
-				sinon.spy(bufferLoader, 'load');
+		describe('#constructor', function() {
+			it('should throw error if AudioBuffer is not provided', function(){
+				utils.isBuffer.restore();
+				var isBufferStub = sinon.stub(utils, 'isBuffer');
+				isBufferStub.returns(false); //force the error
+				expect(Sound).to.throw(Error);
 			});
 
-			afterEach(function() {
-				sound.load.restore();
-				bufferLoader.load.restore();
+			it('stores the provided buffer', function(){
+				expect(sound.buffer).to.be.equal('test buffer');
 			});
 
-			it('should set the sourceFile', function() {
-				sound.load(testFile);
-				expect(sound.load.thisValues[0].filePath).to.be.equal(testFile);
-			});
-
-			it('calls bufferLoader.load passing the filePath and a callback', function(){
-				sound.load(testFile);
-				expect(bufferLoader.load.args[0][0]).to.be.equal(testFile);
-				expect(bufferLoader.load.args[0][1]).to.be.a('function');
-			});
-		});
-
-		describe('#setBuffer', function() {
-			it('should set the buffer to the Sound scope', function() {
-				sound.setBuffer('testBuffer');
-				expect(sound.buffer).to.be.equal('testBuffer');
-			});
-
-			it('should call the callback if provided', function() {
-				var spy = sinon.spy();
-				sound.setBuffer('', spy);
-				expect(spy.called).to.be.true;
+			it('should not be playing', function(){
+				expect(sound.isPlaying).to.be.false;
 			});
 		});
 
@@ -74,7 +57,6 @@ define([
 					connect : connectSpy,
 					loop : false					
 				});
-				sound.buffer = "test buffer";
 
 				sound.connectAudioGraph();
 			});

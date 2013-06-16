@@ -1,7 +1,7 @@
 define([
-	'lib/bufferLoader',
+	'lib/utils',
 	'lib/audioContext'
-], function(bufferLoader){
+], function(utils){
 	
 	var audioContext = require('lib/audioContext').audioContext;
 
@@ -9,37 +9,17 @@ define([
 	* @constructor
 	* @param {String} [filePath]
 	*/
-	function Sound() {
-		this.buffer = null;
-		this.filePath = "";
+	function Sound(buffer) {
+		if (!utils.isBuffer(buffer)) throw Error("Must pass AudioBuffer to Sound constructor");
+
+		this.buffer = buffer;
 		this.source = {};
 		this.isPlaying = false;
 	}
 
-	Sound.prototype.setFilePath = function(filePath) {
-		this.filePath = filePath;
-	}
-
-	Sound.prototype.getFilePath = function() {
-		return this.filePath;
-	}
-
-	Sound.prototype.load = function(filePath, callback) {
-		if (typeof callback !== "function") callback = function(){};
-		this.setFilePath(filePath);
-		
-		var self = this;
-		bufferLoader.load(filePath, function(err, buffer) {
-			if (err) throw err;
-			self.setBuffer(buffer, callback);
-		});
-	}
-
-	Sound.prototype.setBuffer = function(buffer, cb) {
-		this.buffer = buffer;
-		if (typeof cb === 'function') cb();
-	}
-
+	/**
+	* TODO: all the other fun stuff an audio graph can do
+	*/
 	Sound.prototype.connectAudioGraph = function() {
 		this.source = audioContext.createBufferSource();
 		this.source.buffer = this.buffer;                    		// tell the source which sound to play
@@ -47,9 +27,6 @@ define([
 		this.source.loop = true;
 	}
 
-	/**
-	* TODO: this seems too simple, what about all that other crap you can do?
-	*/
 	Sound.prototype.play = function() {
 		this.connectAudioGraph();
 		this.source.start(0.0);

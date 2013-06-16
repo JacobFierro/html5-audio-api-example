@@ -6,21 +6,26 @@ require.config({
 
 // Require libraries
 require([
+  'lib/bufferLoader',
   'lib/sound',
   'vendor/jquery'
-], function(Sound){
+], function(bufferLoader, Sound){
   var $playButton = $('#playTrigger');
   var $stopButton = $('#stopTrigger')
 
-  var piano = new Sound;
-  piano.load('/src/sounds/piano.mp3', function(err) {
-    if (!!err) throw err;
+  var piano;
 
-    showButton();
+  bufferLoader.loadFile('/src/sounds/piano.mp3', onBufferLoad);
+
+  function onBufferLoad(err, buffer) {
+    if (err) throw err;
+
+    piano = new Sound(buffer);
+    showButtons();
     setButtonHandler();
-  });
+  }
 
-  function showButton() {
+  function showButtons() {
     $playButton.show();
     $stopButton.show();
   }

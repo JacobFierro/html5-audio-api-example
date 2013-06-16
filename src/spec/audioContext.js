@@ -1,6 +1,6 @@
 define(['lib/audioContext'],function(Context){
 
-  describe('AudioContext', function(){
+  describe('AudioContext: browser specification adherence', function(){
   	var context;
 	try {
 		context = Context.getAudioContext();
@@ -8,7 +8,7 @@ define(['lib/audioContext'],function(Context){
 		console.log('AudioContext not supported, not continuing test suite');
 	}
   	
-  	it('should be supported by this browser', function(){
+  	it('implemented by this browser', function(){
   		expect(Context.getAudioContext).not.to.throw(Error);
   	});
 

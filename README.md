@@ -5,7 +5,7 @@ This project is part of an ongoing series exploring the web audio api. You can (
 ## 3rd Party Shout-Outs
 
 * [RequireJS + Mocha + Chai Bootstrap](https://github.com/karlbright/requirejs-mocha-chai-bootstrap)
-* [Mocha](http://visionmedia.github.io/mocha)
+* [Mocha](http://mochajs.org/)
 * [Chai](http://chaijs.com)
 * [Require](requirejs.org)
 
